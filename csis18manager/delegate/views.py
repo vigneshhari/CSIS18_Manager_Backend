@@ -28,7 +28,7 @@ def registermain(request):
     if(len(datadel) == 0):
         return JsonResponse({'statuscode' : "303"})
     Delegate.objects.all().filter(Csisid = request.GET.get('csisid')).update(Registered = 1 , Registertime = timezone.now())
-    return JsonResponse({'statuscode' : '100'})
+    return JsonResponse({'statuscode' : '100' , "name" : datadel[0].Fname + " " + datadel[0].Lname})
 
 
 def registertrack(request):
@@ -44,7 +44,7 @@ def registertrack(request):
             temp.Attending = 1
             temp.last_checkin = timezone.now()
             temp.save()
-            return JsonResponse({"statuscode" : 100})
+            return JsonResponse({"statuscode" : 100 , "name" : datadel[0].Fname + " " + datadel[0].Lname})
 
     return JsonResponse({"statuscode" : '500'})
 
@@ -62,16 +62,13 @@ def deregistertrack(request):
             FMT = '%H:%M:%S'
             temp.Total_Time = temp.Total_Time + minutes(  timezone.now() -  temp.last_checkin)
             temp.save()
-            return JsonResponse({"statuscode" : 100})
+            return JsonResponse({"statuscode" : 100 , "name" : datadel[0].Fname + " " + datadel[0].Lname})
             
     return JsonResponse({"statuscode" : '500'})
 
 def listattendtrack(request):
-    if( 'csisid' not in request.GET.keys() or 'track' not in request.GET.keys() ):
+    if(  'track' not in request.GET.keys() ):
         return JsonResponse({"statuscode" : "404"})
-    datadel = Delegate.objects.all().filter(Csisid = request.GET.get('csisid'))
-    if(len(datadel) == 0):
-        return JsonResponse({'statuscode' : "303"})
     Trackobj = Track_Model.objects.get(TrackName = request.GET.get('track'))
     delegates = Delegate.objects.all().filter(Tracks__TrackName = Trackobj , Tracks__Attendence__Attending = 1)
     data = []
@@ -81,11 +78,8 @@ def listattendtrack(request):
 
 
 def listmissingtrack(request):
-    if( 'csisid' not in request.GET.keys() or 'track' not in request.GET.keys() ):
+    if( 'track' not in request.GET.keys() ):
         return JsonResponse({"statuscode" : "404"})
-    datadel = Delegate.objects.all().filter(Csisid = request.GET.get('csisid'))
-    if(len(datadel) == 0):
-        return JsonResponse({'statuscode' : "303"})
     Trackobj = Track_Model.objects.get(TrackName = request.GET.get('track'))
     delegates = Delegate.objects.all().filter(Tracks__TrackName = Trackobj , Tracks__Attendence__Attending = 0)
     data = []
