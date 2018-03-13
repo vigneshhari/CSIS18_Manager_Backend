@@ -1,2 +1,2 @@
-web: python3 innathe_parupadi/manage.py runserver "0.0.0.0:$PORT" 
+web: python3 csis18manager/manage.py runserver "0.0.0.0:$PORT" 
 
